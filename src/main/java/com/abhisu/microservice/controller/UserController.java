@@ -4,6 +4,8 @@ import com.abhisu.microservice.customException.DataNotFountException;
 import com.abhisu.microservice.entity.User;
 import com.abhisu.microservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,12 +29,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/users/{id}")
-    public User findById(@PathVariable Integer id) {
+    public EntityModel<User> findById(@PathVariable Integer id) {
         User user = service.findById(id);
         if (user == null) {
             throw new DataNotFountException("Data not found with id : " + id);
         }
-        return user;
+        ;
+        return EntityModel.of(user).add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).findAll()).withRel("all-users"));
     }
 
     @PostMapping("/users")
@@ -46,4 +49,6 @@ public class UserController {
     public void deleteById(@PathVariable Integer id) {
         service.deleteById(id);
     }
+
+
 }

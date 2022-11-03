@@ -2,6 +2,7 @@ package com.abhisu.microservice.serviceImpl;
 
 import com.abhisu.microservice.customException.DataNotFountException;
 import com.abhisu.microservice.entity.User;
+import com.abhisu.microservice.repository.UserRepository;
 import com.abhisu.microservice.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -12,34 +13,31 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static List<User> users = new ArrayList<User>();
-    private static int userCount = 0;
-    static {
-        users.add(new User(++userCount,"Abhishek", LocalDate.now()));
-        users.add(new User(++userCount,"Kumar", LocalDate.now()));
-        users.add(new User(++userCount,"Singh", LocalDate.now()));
+    private UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository){
+        this.userRepository = userRepository;
     }
+
     @Override
     public List<User> findAll() {
 
-        return users;
+        return userRepository.findAll();
     }
 
     @Override
     public User findById(Integer id) {
-        return users.stream().filter(data -> data.getId().equals(id)).findFirst().orElse(null);
+        return userRepository.findById(id).orElseGet(null);
     }
 
     @Override
     public User addUser(User user) {
-        user.setId(++userCount);
-        users.add(user);
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
     public void deleteById(Integer id) {
-        users.removeIf(data -> data.getId().equals(id));
+        userRepository.deleteById(id);
     }
 
 }
